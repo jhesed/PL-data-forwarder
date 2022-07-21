@@ -1,0 +1,5 @@
+flowmeter, pressure, temperature, alarm
+100, 27, 56, 0
+20, 12, 65, 0
+35.7, 13, 90.22, 1
+51, 90, 17, 0
