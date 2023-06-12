@@ -2,6 +2,7 @@ import csv
 import hashlib
 import logging
 import os
+from typing import List
 
 import requests
 
@@ -13,7 +14,7 @@ APP_KEY = os.getenv("APP_KEY")
 APP_SECRET = hashlib.sha256(os.getenv("APP_SECRET").encode("utf-8")).digest()
 BLOCK_SIZE = int(os.getenv("BLOCK_SIZE", 16))
 API_ENDPOINT = os.getenv("API_ENDPOINT")
-DELETE_CSV = True if int(os.getenv("DELETE_FILE", "1")) == 1 else 0
+DELETE_CSV = True if int(os.getenv("DELETE_FILE", "0")) == 1 else 0
 
 # Setup Logger
 logging.basicConfig(level=logging.INFO)
@@ -32,6 +33,13 @@ def forward_data(data: str) -> dict:
     ).json()
 
 
+def forward_data_unencrypted(data: List[dict]) -> dict:
+    """Use for testing purposes"""
+    return requests.post(
+        API_ENDPOINT, json=data, headers={"htt": APP_KEY}
+    ).json()
+
+
 def delete_file() -> None:
     os.remove(CSV_PATH)
 
@@ -46,12 +54,15 @@ def main():
     raw_data = read_file()
     logger.info({"msg": "Got raw data", "raw_data": raw_data})
 
-    encrypted_data = encrypt_data(
-        data=raw_data, app_secret=APP_SECRET, block_size=BLOCK_SIZE
-    )
-    logger.info({"msg": "Encrypted data", "encrypted_data": encrypted_data})
+    # TODO: Let's not complicate ourselves with encryption for now
+    # encrypted_data = encrypt_data(
+    #     data=raw_data, app_secret=APP_SECRET, block_size=BLOCK_SIZE
+    # )
+    # logger.info({"msg": "Encrypted data", "encrypted_data": encrypted_data})
+    #
+    # response = forward_data(data=encrypted_data)
 
-    response = forward_data(data=encrypted_data)
+    response = forward_data_unencrypted(data=raw_data)
     logger.info({"msg": "Response from server", "response": response})
 
     if DELETE_CSV:
