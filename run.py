@@ -13,6 +13,7 @@ APP_KEY = os.getenv("APP_KEY")
 APP_SECRET = hashlib.sha256(os.getenv("APP_SECRET").encode("utf-8")).digest()
 BLOCK_SIZE = int(os.getenv("BLOCK_SIZE", 16))
 API_ENDPOINT = os.getenv("API_ENDPOINT")
+DELETE_CSV = True if int(os.getenv("DELETE_FILE", "1")) == 1 else 0
 
 # Setup Logger
 logging.basicConfig(level=logging.INFO)
@@ -53,8 +54,9 @@ def main():
     response = forward_data(data=encrypted_data)
     logger.info({"msg": "Response from server", "response": response})
 
-    delete_file()
-    logger.info({"msg": "Done deleting the file", "file": CSV_PATH})
+    if DELETE_CSV:
+        delete_file()
+        logger.info({"msg": "Done deleting the file", "file": CSV_PATH})
 
 
 if __name__ == "__main__":
